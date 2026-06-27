@@ -127,10 +127,10 @@ export default function ConstellationPage({
   };
 
   return (
-    <main className="relative w-screen h-screen bg-slate-950" style={{ overflowX: "auto", overflowY: "hidden" }}>
+    <main className="relative w-screen h-screen overflow-hidden bg-slate-950">
 
       {/* ШАР 1 — Фонові зірки */}
-      <div className="absolute inset-0 z-0" style={{ minWidth: 900 }}>
+      <div className="absolute inset-0 z-0">
         {BACKGROUND_STARS.map((star) => (
           <motion.div
             key={star.id}
@@ -145,9 +145,9 @@ export default function ConstellationPage({
       {/* ШАР 2 — Туманність */}
       <motion.div
         className="absolute inset-0 z-0 pointer-events-none"
-        style={{ minWidth: 900 }}
+
         animate={{ x: `${current.skyX * 0.4}vw`, y: `${current.skyY * 0.4}vh` }}
-        transition={{ type: "spring", stiffness: 25, damping: 20 }}
+        transition={{ type: "tween", duration: 0.5, ease: "easeOut" }}
       >
         <div className="absolute rounded-full opacity-20 blur-[120px]" style={{
           width: "60vw", height: "60vw", top: "20%", left: "20%",
@@ -156,7 +156,7 @@ export default function ConstellationPage({
       </motion.div>
 
       {/* ШАР 3 — Зірки сузір'я */}
-      <div className="absolute inset-0 z-10" style={{ minWidth: 900 }}>
+      <div className="absolute inset-0 z-10">
         <AnimatePresence mode="wait" custom={dirRef.current}>
           <motion.div
             key={current.id}
@@ -178,7 +178,7 @@ export default function ConstellationPage({
             initial="enter"
             animate="show"
             exit="exit"
-            transition={{ duration: 0.55, ease: "easeInOut" }}
+            transition={{ duration: 0.35, ease: "easeOut" }}
             className="absolute inset-0"
           >
             {/* Лінії між зірками */}
@@ -275,14 +275,14 @@ export default function ConstellationPage({
       </div>
 
       {/* ШАР 4 — Назва сузір'я */}
-      <div className="fixed inset-x-0 bottom-10 z-20 flex flex-col items-center gap-2">
+      <div className="absolute inset-x-0 bottom-10 z-20 flex flex-col items-center gap-2">
         <AnimatePresence mode="wait">
           <motion.button
             key={current.id}
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -8 }}
-            transition={{ duration: 0.6 }}
+            transition={{ duration: 0.3 }}
             onClick={() => setIsModalOpen(true)}
             className="group flex flex-col items-center gap-1 cursor-none focus:outline-none"
           >
@@ -315,12 +315,12 @@ export default function ConstellationPage({
       </div>
 
       {/* ШАР 5 — Стрілки */}
-      <div className="fixed inset-y-0 left-4 z-20 flex items-center">
+      <div className="absolute inset-y-0 left-4 z-20 flex items-center">
         <button onClick={goPrev} className="p-2 text-slate-600 hover:text-slate-300 transition-colors cursor-none focus:outline-none group">
           <ChevronLeft size={20} className="group-hover:scale-110 transition-transform" />
         </button>
       </div>
-      <div className="fixed inset-y-0 right-14 z-20 flex items-center">
+      <div className="absolute inset-y-0 right-14 z-20 flex items-center">
         <button onClick={goNext} className="p-2 text-slate-600 hover:text-slate-300 transition-colors cursor-none focus:outline-none group">
           <ChevronRight size={20} className="group-hover:scale-110 transition-transform" />
         </button>
@@ -329,7 +329,7 @@ export default function ConstellationPage({
       {/* ШАР 6 — Кнопка меню */}
       <button
         onClick={() => setIsNavOpen(true)}
-        className="fixed top-5 right-5 z-30 p-2.5 bg-slate-900/50 border border-slate-800/60 rounded-full hover:bg-slate-800/80 transition-all duration-200 cursor-none focus:outline-none hover:border-slate-700"
+        className="absolute top-5 right-5 z-30 p-2.5 bg-slate-900/50 border border-slate-800/60 rounded-full hover:bg-slate-800/80 transition-all duration-200 cursor-none focus:outline-none hover:border-slate-700"
       >
         <Menu size={16} className="text-slate-400" />
       </button>
@@ -345,7 +345,7 @@ export default function ConstellationPage({
             />
             <motion.div
               initial={{ x: "100%" }} animate={{ x: 0 }} exit={{ x: "100%" }}
-              transition={{ type: "tween", duration: 0.25, ease: "easeOut" }}
+              transition={{ type: "tween", duration: 0.18, ease: "easeOut" }}
               className="fixed top-0 right-0 h-full z-50 flex flex-col"
               style={{
                 width: 288,
@@ -418,16 +418,16 @@ export default function ConstellationPage({
         {isModalOpen && (
           <motion.div
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-            transition={{ duration: 0.35 }}
+            transition={{ duration: 0.18 }}
             className="fixed inset-0 z-50 flex items-center justify-center p-4 md:p-10"
-            style={{ background: "rgba(2,1,6,0.85)", backdropFilter: "blur(14px)" }}
+            style={{ background: "rgba(2,1,6,0.88)" }}
             onClick={(e) => { if (e.target === e.currentTarget) setIsModalOpen(false); }}
           >
             <motion.div
-              initial={{ scale: 0.93, y: 20, opacity: 0 }}
-              animate={{ scale: 1,    y: 0,  opacity: 1 }}
-              exit={{    scale: 0.93, y: 20, opacity: 0 }}
-              transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{    opacity: 0, y: 12 }}
+              transition={{ duration: 0.2, ease: "easeOut" }}
               className="relative w-full max-w-4xl flex flex-col"
               style={{
                 maxHeight: "88vh",
@@ -529,7 +529,7 @@ export default function ConstellationPage({
                       <motion.div
                         key={activeTab}
                         initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }}
-                        transition={{ duration: 0.22 }}
+                        transition={{ duration: 0.15 }}
                       >
                         <p style={{ fontSize: 9, letterSpacing: "0.35em", color: "rgba(201,168,76,0.45)", fontFamily: "'Cormorant SC', Georgia, serif", marginBottom: 16 }}>
                           {tabLabels[activeTab]}

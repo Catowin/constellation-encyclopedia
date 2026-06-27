@@ -4,7 +4,7 @@ import { useState, useEffect, use, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X, ChevronLeft, ChevronRight } from "lucide-react";
-import { constellations } from "@/data/constellations";
+import { constellations, t, type Lang, type ConstellationData } from "@/data/constellations";
 
 type Tab = "desc" | "legend" | "find";
 
@@ -24,6 +24,95 @@ const BACKGROUND_STARS = Array.from({ length: 180 }, (_, i) => ({
   delay:     r4(sr(i * 11) * 5),
   opacity:   r4(sr(i * 17) * 0.5 + 0.35),
 }));
+
+
+// ─── SVG компонент для сузір'їв з viewBox ────────────────────────────────────
+function ConstellationSVG({
+  current,
+  hoveredStar,
+  onStarEnter,
+  onStarLeave,
+}: {
+  current: ConstellationData;
+  hoveredStar: string | null;
+  onStarEnter: (name: string) => void;
+  onStarLeave: () => void;
+}) {
+  const [vx, vy, vw, vh] = current.viewBox!;
+
+  return (
+    <svg
+      viewBox={`${vx} ${vy} ${vw} ${vh}`}
+      preserveAspectRatio="xMidYMid meet"
+      className="absolute inset-0 w-full h-full"
+    >
+      <defs>
+        <radialGradient id="halo">
+          <stop offset="0%" stopColor="rgba(253,230,138,0.45)" />
+          <stop offset="100%" stopColor="rgba(253,230,138,0)" />
+        </radialGradient>
+      </defs>
+
+      {/* Лінії */}
+      {current.lines?.map(([a, b], idx) => {
+        const sa = current.stars[a];
+        const sb = current.stars[b];
+        if (!sa || !sb) return null;
+        return (
+          <line key={idx}
+            x1={parseFloat(sa.left)} y1={parseFloat(sa.top)}
+            x2={parseFloat(sb.left)} y2={parseFloat(sb.top)}
+            stroke="rgba(165,180,252,0.25)"
+            strokeWidth="0.35"
+            strokeDasharray="1.2 2"
+          />
+        );
+      })}
+
+      {/* Зірки */}
+      {current.stars.map((star, idx) => {
+        const cx = parseFloat(star.left);
+        const cy = parseFloat(star.top);
+        const r = star.size * 0.09;
+        const isHovered = hoveredStar === star.name;
+        return (
+          <g key={idx}>
+            {/* Ореол */}
+            <circle cx={cx} cy={cy} r={r * 4} fill="url(#halo)" opacity={0.6} style={{ pointerEvents: "none" }} />
+            {/* Зірка з мерехтінням */}
+            <circle cx={cx} cy={cy} r={r} fill="white" opacity={0.9}
+              className="star-twinkle"
+              style={{ ["--r" as string]: `${r}`, ["--dur" as string]: `${2 + (idx % 4) * 0.7}s`, ["--delay" as string]: `${(idx * 0.4) % 3}s`, pointerEvents: "none" }}
+            />
+            {/* Зона наведення */}
+            <circle cx={cx} cy={cy} r={3} fill="transparent"
+              onMouseEnter={() => onStarEnter(star.name)}
+              onMouseLeave={onStarLeave}
+              style={{ cursor: "none" }}
+            />
+            {/* Підпис */}
+            {isHovered && (
+              <g style={{ pointerEvents: "none" }}>
+                <rect
+                  x={cx - star.name.length * 1.5} y={cy + r + 0.5}
+                  width={star.name.length * 3} height={4}
+                  rx={0.4} fill="rgba(6,4,9,0.92)"
+                  stroke="rgba(253,230,138,0.4)" strokeWidth={0.2}
+                />
+                <text x={cx} y={cy + r + 3.5} textAnchor="middle"
+                  fontSize={2} letterSpacing={0.2}
+                  fill="rgba(253,230,138,0.92)"
+                  fontFamily="'Cormorant SC', Georgia, serif">
+                  {star.name}
+                </text>
+              </g>
+            )}
+          </g>
+        );
+      })}
+    </svg>
+  );
+}
 
 export default function ConstellationPage({
   params,
@@ -46,6 +135,7 @@ export default function ConstellationPage({
   const [hoveredStar, setHoveredStar] = useState<string | null>(null);
   const [navSearch, setNavSearch] = useState("");
   const [touchStart, setTouchStart] = useState<number | null>(null);
+  const [lang, setLang] = useState<Lang>("uk");
 
   const goNext = useCallback(() => {
     dirRef.current = "right";
@@ -114,16 +204,22 @@ export default function ConstellationPage({
   useEffect(() => { setActiveTab("desc"); }, [current.id]);
 
   const filteredConstellations = constellations.filter((c) =>
-    c.name.toLowerCase().includes(navSearch.toLowerCase())
+    t(c.name, lang).toLowerCase().includes(navSearch.toLowerCase())
   );
 
   if (!current) return null;
 
-  const tabLabels: Record<Tab, string> = { desc: "Опис", legend: "Легенда", find: "Як знайти" };
+  const langLabels = {
+    uk: { desc: "Опис", legend: "Легенда", find: "Як знайти", more: "натисни, щоб дізнатись більше", scroll: "скролл або стрілки", search: "Пошук сузір'я...", notFound: "Нічого не знайдено", encycl: "Енциклопедія", constell: "Constellation" },
+    la: { desc: "Descriptio", legend: "Fabula", find: "Quomodo invenire", more: "tange ut plus scias", scroll: "volutare vel sagittas uti", search: "Quaere...", notFound: "Nihil inventum", encycl: "Encyclopaedia", constell: "Constellatio" },
+    en: { desc: "Description", legend: "Legend", find: "How to find", more: "tap to learn more", scroll: "scroll or arrow keys", search: "Search...", notFound: "Nothing found", encycl: "Encyclopedia", constell: "Constellation" },
+  };
+  const L = langLabels[lang];
+  const tabLabels: Record<Tab, string> = { desc: L.desc, legend: L.legend, find: L.find };
   const tabContent: Record<Tab, string> = {
-    desc: current.description,
-    legend: current.legend,
-    find: current.howToFind,
+    desc:   t(current.description, lang),
+    legend: t(current.legend, lang),
+    find:   t(current.howToFind, lang),
   };
 
   return (
@@ -162,18 +258,9 @@ export default function ConstellationPage({
             key={current.id}
             custom={dirRef.current}
             variants={{
-              enter: (dir: "left" | "right") => ({
-                opacity: 0,
-                x: dir === "right" ? 40 : -40,
-              }),
-              show: {
-                opacity: 1,
-                x: 0,
-              },
-              exit: (dir: "left" | "right") => ({
-                opacity: 0,
-                x: dir === "right" ? -40 : 40,
-              }),
+              enter: (dir: "left" | "right") => ({ opacity: 0, x: dir === "right" ? 40 : -40 }),
+              show:  { opacity: 1, x: 0 },
+              exit:  (dir: "left" | "right") => ({ opacity: 0, x: dir === "right" ? -40 : 40 }),
             }}
             initial="enter"
             animate="show"
@@ -181,95 +268,82 @@ export default function ConstellationPage({
             transition={{ duration: 0.35, ease: "easeOut" }}
             className="absolute inset-0"
           >
-            {/* Лінії між зірками */}
-            <svg className="absolute inset-0 w-full h-full pointer-events-none">
-              {(current.lines
-                ? current.lines.map(([a, b], idx) => {
-                    const sa = current.stars[a];
-                    const sb = current.stars[b];
-                    if (!sa || !sb) return null;
-                    return (
-                      <line key={idx}
-                        x1={sa.left} y1={sa.top} x2={sb.left} y2={sb.top}
-                        stroke="rgba(165,180,252,0.22)" strokeWidth="1" strokeDasharray="3 4"
+            {current.viewBox ? (
+              <ConstellationSVG
+                current={current}
+                hoveredStar={hoveredStar}
+                onStarEnter={handleStarEnter}
+                onStarLeave={handleStarLeave}
+              />
+            ) : (
+              // SVG рендер для сузір'їв з generated-stars (координати у відсотках)
+              <svg
+                viewBox="0 0 100 100"
+                preserveAspectRatio="xMidYMid meet"
+                className="absolute inset-0 w-full h-full"
+              >
+                <defs>
+                  <radialGradient id="halo2">
+                    <stop offset="0%" stopColor="rgba(253,230,138,0.45)" />
+                    <stop offset="100%" stopColor="rgba(253,230,138,0)" />
+                  </radialGradient>
+                </defs>
+
+                {/* Лінії */}
+                {current.lines?.map(([a, b], idx) => {
+                  const sa = current.stars[a];
+                  const sb = current.stars[b];
+                  if (!sa || !sb) return null;
+                  return (
+                    <line key={idx}
+                      x1={parseFloat(sa.left)} y1={parseFloat(sa.top)}
+                      x2={parseFloat(sb.left)} y2={parseFloat(sb.top)}
+                      stroke="rgba(165,180,252,0.22)"
+                      strokeWidth="0.4"
+                      strokeDasharray="1.5 2.5"
+                    />
+                  );
+                })}
+
+                {/* Зірки */}
+                {current.stars.map((star, idx) => {
+                  const cx = parseFloat(star.left);
+                  const cy = parseFloat(star.top);
+                  const r = star.size * 0.14;
+                  const isHovered = hoveredStar === star.name;
+                  return (
+                    <g key={idx}>
+                      <circle cx={cx} cy={cy} r={r * 4} fill="url(#halo2)" opacity={0.6} style={{ pointerEvents: "none" }} />
+                      <circle cx={cx} cy={cy} r={r} fill="white" opacity={0.9}
+                        className="star-twinkle"
+                        style={{ ["--r" as string]: `${r}`, ["--dur" as string]: `${2 + (idx % 4) * 0.7}s`, ["--delay" as string]: `${(idx * 0.4) % 3}s`, pointerEvents: "none" }}
                       />
-                    );
-                  })
-                : current.stars.map((star, idx) => {
-                    if (idx === 0) return null;
-                    const prev = current.stars[idx - 1];
-                    return (
-                      <line key={idx}
-                        x1={prev.left} y1={prev.top} x2={star.left} y2={star.top}
-                        stroke="rgba(165,180,252,0.18)" strokeWidth="1" strokeDasharray="3 4"
+                      <circle cx={cx} cy={cy} r={2.5} fill="transparent"
+                        onMouseEnter={() => handleStarEnter(star.name)}
+                        onMouseLeave={handleStarLeave}
+                        style={{ cursor: "none" }}
                       />
-                    );
-                  })
-              )}
-            </svg>
-
-            {/* Зірки */}
-            {current.stars.map((star, idx) => (
-              <div key={idx} className="absolute" style={{ top: star.top, left: star.left }}>
-
-                {/* Невидима зона наведення 44×44px */}
-                <div
-                  className="absolute -translate-x-1/2 -translate-y-1/2 z-10"
-                  style={{ width: 44, height: 44 }}
-                  onMouseEnter={() => handleStarEnter(star.name)}
-                  onMouseLeave={handleStarLeave}
-                />
-
-                {/* Ореол зірки */}
-                <motion.div
-                  className="absolute rounded-full -translate-x-1/2 -translate-y-1/2 pointer-events-none"
-                  style={{
-                    width: star.size * 6, height: star.size * 6,
-                    background: "radial-gradient(circle, rgba(253,230,138,0.15) 0%, transparent 70%)",
-                  }}
-                  animate={{ scale: [0.8, 1.2, 0.8] }}
-                  transition={{ duration: 2.5 + (idx % 4), repeat: Infinity, ease: "easeInOut" }}
-                />
-
-                {/* Сама зірка */}
-                <motion.div
-                  className="absolute rounded-full -translate-x-1/2 -translate-y-1/2 pointer-events-none"
-                  style={{
-                    width: star.size, height: star.size, background: "white",
-                    boxShadow: `0 0 ${star.size * 3}px rgba(255,255,255,0.8), 0 0 ${star.size * 6}px rgba(253,230,138,0.4)`,
-                  }}
-                  animate={{ opacity: [0.5, 1, 0.5], scale: [0.85, 1.15, 0.85] }}
-                  transition={{ duration: 2 + (idx % 3) * 0.8, repeat: Infinity, ease: "easeInOut", delay: idx * 0.3 }}
-                />
-
-                {/* Підпис зірки */}
-                <AnimatePresence>
-                  {hoveredStar === star.name && (
-                    <motion.div
-                      initial={{ opacity: 0, y: 8, scale: 0.95 }}
-                      animate={{ opacity: 1, y: 0, scale: 1 }}
-                      exit={{ opacity: 0, y: 8, scale: 0.95 }}
-                      transition={{ duration: 0.15 }}
-                      className="absolute left-1/2 -translate-x-1/2 pointer-events-none z-20"
-                      style={{ top: star.size + 10 }}
-                    >
-                      <div style={{
-                        padding: "5px 12px",
-                        background: "rgba(8,6,14,0.92)",
-                        border: "1px solid rgba(253,230,138,0.35)",
-                        fontSize: 11,
-                        letterSpacing: "0.2em",
-                        color: "rgba(253,230,138,0.9)",
-                        whiteSpace: "nowrap",
-                        fontFamily: "'Cormorant SC', Georgia, serif",
-                      }}>
-                        {star.name}
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
-            ))}
+                      {isHovered && (
+                        <g style={{ pointerEvents: "none" }}>
+                          <rect
+                            x={cx - star.name.length * 1.5} y={cy + r + 0.5}
+                            width={star.name.length * 3} height={4}
+                            rx={0.4} fill="rgba(6,4,9,0.92)"
+                            stroke="rgba(253,230,138,0.4)" strokeWidth={0.2}
+                          />
+                          <text x={cx} y={cy + r + 3.5} textAnchor="middle"
+                            fontSize={2} letterSpacing={0.2}
+                            fill="rgba(253,230,138,0.92)"
+                            fontFamily="'Cormorant SC', Georgia, serif">
+                            {star.name}
+                          </text>
+                        </g>
+                      )}
+                    </g>
+                  );
+                })}
+              </svg>
+            )}
           </motion.div>
         </AnimatePresence>
       </div>
@@ -294,11 +368,11 @@ export default function ConstellationPage({
               className="constellation-name"
               style={{ fontSize: "clamp(18px, 2.5vw, 26px)" }}
             >
-              {current.name}
+              {t(current.name, lang)}
             </h1>
             <span className="text-[10px] tracking-[0.3em] text-slate-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
               style={{ fontFamily: "'Cormorant SC', Georgia, serif" }}>
-              натисни, щоб дізнатись більше
+              {L.more}
             </span>
           </motion.button>
         </AnimatePresence>
@@ -308,7 +382,7 @@ export default function ConstellationPage({
         >
           <div className="h-px w-8" style={{ background: "rgba(201,168,76,0.2)" }} />
           <span style={{ fontSize: 9, letterSpacing: "0.3em", color: "rgba(201,168,76,0.3)", fontFamily: "'Cormorant SC', Georgia, serif" }}>
-            скролл або стрілки
+            {L.scroll}
           </span>
           <div className="h-px w-8" style={{ background: "rgba(201,168,76,0.2)" }} />
         </motion.div>
@@ -356,7 +430,7 @@ export default function ConstellationPage({
               <div className="flex justify-between items-center p-5" style={{ borderBottom: "1px solid rgba(201,168,76,0.12)" }}>
                 <div>
                   <p style={{ fontSize: 10, letterSpacing: "0.25em", color: "rgba(201,168,76,0.6)", fontFamily: "'Cormorant SC', Georgia, serif" }}>
-                    Енциклопедія
+                    {L.encycl}
                   </p>
                   <p style={{ fontSize: 22, fontWeight: 300, color: "rgba(245,234,212,0.7)", fontFamily: "'Cormorant Garamond', Georgia, serif", marginTop: 4 }}>
                     88 сузір&apos;їв
@@ -370,7 +444,7 @@ export default function ConstellationPage({
               <div className="px-4 py-3" style={{ borderBottom: "1px solid rgba(201,168,76,0.08)" }}>
                 <input
                   type="text"
-                  placeholder="Пошук сузір'я..."
+                  placeholder={L.search}
                   value={navSearch}
                   onChange={(e) => setNavSearch(e.target.value)}
                   style={{
@@ -393,7 +467,7 @@ export default function ConstellationPage({
                 style={{ scrollbarWidth: "thin", scrollbarColor: "rgba(201,168,76,0.2) transparent" }}>
                 {filteredConstellations.length === 0 ? (
                   <p className="text-center py-8" style={{ fontSize: 12, color: "rgba(201,168,76,0.3)", fontFamily: "'Cormorant SC', Georgia, serif" }}>
-                    Нічого не знайдено
+                    {L.notFound}
                   </p>
                 ) : (
                   filteredConstellations.map((c) => (
@@ -403,10 +477,30 @@ export default function ConstellationPage({
                       className={`nav-btn focus:outline-none ${c.id === current.id ? "nav-active" : ""}`}
                     >
                       {c.id === current.id && <span style={{ fontSize: 8, color: "rgba(201,168,76,0.8)" }}>✦</span>}
-                      <span>{c.name}</span>
+                      <span>{t(c.name, lang)}</span>
                     </button>
                   ))
                 )}
+              </div>
+
+              {/* Перемикач мови */}
+              <div style={{ borderTop: "1px solid rgba(201,168,76,0.12)", display: "flex", justifyContent: "center", gap: 4, padding: "12px 0" }}>
+                {(["uk", "la", "en"] as Lang[]).map((l) => (
+                  <button key={l} onClick={() => setLang(l)}
+                    className="focus:outline-none"
+                    style={{
+                      fontFamily: "'Cormorant SC', Georgia, serif",
+                      fontSize: 11, letterSpacing: "0.18em",
+                      padding: "4px 12px",
+                      background: "none", border: "none",
+                      color: lang === l ? "rgba(255,220,100,1)" : "rgba(201,168,76,0.32)",
+                      textShadow: lang === l ? "0 0 14px rgba(201,168,76,0.7)" : "none",
+                      borderBottom: lang === l ? "1px solid rgba(201,168,76,0.7)" : "1px solid transparent",
+                      transition: "all 0.15s ease",
+                    }}>
+                    {l === "uk" ? "УКР" : l === "la" ? "LAT" : "ENG"}
+                  </button>
+                ))}
               </div>
             </motion.div>
           </>
@@ -462,7 +556,7 @@ export default function ConstellationPage({
               {/* Заголовок */}
               <div className="flex-shrink-0 px-8 pt-7 pb-0 text-center">
                 <p style={{ fontSize: 9, letterSpacing: "0.4em", color: "rgba(201,168,76,0.45)", fontFamily: "'Cormorant SC', Georgia, serif", marginBottom: 8 }}>
-                  Constellation
+                  {L.constell}
                 </p>
                 <h2 style={{
                   fontFamily: "'Cormorant SC', Georgia, serif",
@@ -471,7 +565,7 @@ export default function ConstellationPage({
                   letterSpacing: "0.18em",
                   color: "rgba(245,234,212,0.92)",
                 }}>
-                  {current.name}
+                  {t(current.name, lang)}
                 </h2>
                 {/* Золота лінія */}
                 <div style={{
@@ -509,13 +603,13 @@ export default function ConstellationPage({
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
                         src={current.image}
-                        alt={`Схема сузір'я ${current.name}`}
+                        alt={`Схема сузір'я ${t(current.name, "uk")}`}
                         className="max-w-full object-contain rounded"
                         style={{ maxHeight: 240, opacity: 0.8, filter: "sepia(20%) brightness(0.85)" }}
                         onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
                       />
                       <p style={{ fontSize: 9, letterSpacing: "0.3em", color: "rgba(201,168,76,0.35)", fontFamily: "'Cormorant SC', Georgia, serif" }}>
-                        {current.name}
+                        {t(current.name, "uk")}
                       </p>
                     </motion.div>
                   </AnimatePresence>
@@ -542,7 +636,7 @@ export default function ConstellationPage({
                           color: "rgba(245,234,212,0.9)",
                           marginBottom: 16,
                         }}>
-                          {current.name}
+                          {t(current.name, "uk")}
                         </h3>
                         <p style={{
                           fontFamily: "'Cormorant Garamond', Georgia, serif",
@@ -566,7 +660,7 @@ export default function ConstellationPage({
                       style={{ color: "rgba(201,168,76,0.4)", fontFamily: "'Cormorant SC', Georgia, serif", fontSize: 11, letterSpacing: "0.1em" }}
                     >
                       <ChevronLeft size={13} className="group-hover:-translate-x-0.5 transition-transform" />
-                      {constellations[(currentIndex - 1 + constellations.length) % constellations.length].name}
+                      {t(constellations[(currentIndex - 1 + constellations.length) % constellations.length].name, lang)}
                     </button>
                     <span style={{ fontSize: 10, color: "rgba(201,168,76,0.2)", letterSpacing: "0.2em", fontFamily: "'Cormorant SC', Georgia, serif" }}>
                       {currentIndex + 1} · {constellations.length}
@@ -576,7 +670,7 @@ export default function ConstellationPage({
                       className="flex items-center gap-2 cursor-none focus:outline-none group"
                       style={{ color: "rgba(201,168,76,0.4)", fontFamily: "'Cormorant SC', Georgia, serif", fontSize: 11, letterSpacing: "0.1em" }}
                     >
-                      {constellations[(currentIndex + 1) % constellations.length].name}
+                      {t(constellations[(currentIndex + 1) % constellations.length].name, lang)}
                       <ChevronRight size={13} className="group-hover:translate-x-0.5 transition-transform" />
                     </button>
                   </div>
@@ -589,6 +683,14 @@ export default function ConstellationPage({
 
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Cormorant+SC:wght@300;400;500&display=swap');
+
+        @keyframes twinkle {
+          0%, 100% { opacity: 0.7; r: var(--r); }
+          50% { opacity: 1; r: calc(var(--r) * 1.15); }
+        }
+        .star-twinkle {
+          animation: twinkle var(--dur, 3s) ease-in-out infinite var(--delay, 0s);
+        }
 
         .constellation-name {
           font-family: 'Cormorant SC', Georgia, serif;

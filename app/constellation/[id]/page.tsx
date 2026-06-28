@@ -135,10 +135,12 @@ export default function ConstellationPage({
   const [hoveredStar, setHoveredStar] = useState<string | null>(null);
   const [navSearch, setNavSearch] = useState("");
   const [touchStart, setTouchStart] = useState<number | null>(null);
-const [lang, setLang] = useState<Lang>(() => {
-  if (typeof window === "undefined") return "uk";
-  return (localStorage.getItem("lang") as Lang) ?? "uk";
-});
+const [lang, setLang] = useState<Lang>("uk");
+
+useEffect(() => {
+  const saved = localStorage.getItem("lang") as Lang | null;
+  if (saved === "en") setLang("en");
+}, []);
 
 const handleSetLang = (l: Lang) => {
   setLang(l);

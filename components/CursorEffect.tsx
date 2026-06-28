@@ -25,44 +25,46 @@ export default function CursorEffect() {
       posY = e.clientY;
     };
 
-    const handleStarEnter = () => {
-      if (haloLargeRef.current) {
-        haloLargeRef.current.style.width  = "220px";
-        haloLargeRef.current.style.height = "220px";
-        haloLargeRef.current.style.background =
-          "radial-gradient(circle, rgba(253,230,138,0.14) 0%, rgba(99,102,241,0.06) 50%, transparent 70%)";
-      }
-      if (haloSmallRef.current) {
-        haloSmallRef.current.style.width  = "65px";
-        haloSmallRef.current.style.height = "65px";
-        haloSmallRef.current.style.background =
-          "radial-gradient(circle, rgba(253,230,138,0.28) 0%, transparent 70%)";
-      }
-      if (starRef.current) {
-        starRef.current.style.fontSize   = "18px";
-        starRef.current.style.color      = "rgb(253,230,138)";
-        starRef.current.style.textShadow =
-          "0 0 12px rgba(253,230,138,0.9), 0 0 28px rgba(253,230,138,0.5)";
-      }
-    };
+    // ХОВЕР НА ЗІРКУ (Теплий золотавий акцент, акуратний розмір)
+const handleStarEnter = () => {
+  if (haloLargeRef.current) {
+    haloLargeRef.current.style.width  = "90px";
+    haloLargeRef.current.style.height = "90px";
+    haloLargeRef.current.style.background =
+      "radial-gradient(circle, rgba(253,230,138,0.12) 0%, transparent 70%)";
+  }
+  if (haloSmallRef.current) {
+    haloSmallRef.current.style.width  = "24px";
+    haloSmallRef.current.style.height = "24px";
+    haloSmallRef.current.style.background =
+      "radial-gradient(circle, rgba(253,230,138,0.35) 0%, transparent 70%)";
+  }
+  if (starRef.current) {
+    starRef.current.style.fontSize   = "15px";
+    starRef.current.style.color      = "rgb(253,230,138)";
+    starRef.current.style.textShadow =
+      "0 0 6px rgba(253,230,138,0.8), 0 0 12px rgba(253,230,138,0.4)";
+  }
+};
 
+    // ПІСЛЯ ХОВЕРУ / ПОВЕРНЕННЯ В СТАН СПОКОЮ
     const handleStarLeave = () => {
       if (haloLargeRef.current) {
-        haloLargeRef.current.style.width  = "140px";
-        haloLargeRef.current.style.height = "140px";
+        haloLargeRef.current.style.width  = "40px";
+        haloLargeRef.current.style.height = "40px";
         haloLargeRef.current.style.background =
-          "radial-gradient(circle, rgba(99,102,241,0.08) 0%, transparent 70%)";
+          "radial-gradient(circle, rgba(99,102,241,0.15) 0%, rgba(168,85,247,0.05) 45%, transparent 75%)";
       }
       if (haloSmallRef.current) {
-        haloSmallRef.current.style.width  = "30px";
-        haloSmallRef.current.style.height = "30px";
+        haloSmallRef.current.style.width  = "14px";
+        haloSmallRef.current.style.height = "14px";
         haloSmallRef.current.style.background =
-          "radial-gradient(circle, rgba(165,180,252,0.18) 0%, transparent 70%)";
+          "radial-gradient(circle, rgba(165,180,252,0.2) 0%, transparent 70%)";
       }
       if (starRef.current) {
-        starRef.current.style.fontSize   = "13px";
+        starRef.current.style.fontSize   = "12px";
         starRef.current.style.color      = "rgb(199,210,254)";
-        starRef.current.style.textShadow = "0 0 8px rgba(199,210,254,0.7)";
+        starRef.current.style.textShadow = "0 0 6px rgba(199,210,254,0.6)";
       }
     };
 
@@ -81,36 +83,42 @@ export default function CursorEffect() {
 
   return (
     <>
+      {/* Великий зовнішній ореол */}
       <div
         ref={haloLargeRef}
         className="pointer-events-none fixed hidden md:block z-[9999] rounded-full top-0 left-0"
         style={{
-          width: "140px",
-          height: "140px",
-          background: "radial-gradient(circle, rgba(99,102,241,0.08) 0%, transparent 70%)",
-          filter: "blur(3px)",
-          transition: "width 0.3s ease, height 0.3s ease, background 0.3s ease",
+          width: "60px",
+          height: "60px",
+          background: "radial-gradient(circle, rgba(99,102,241,0.15) 0%, rgba(168,85,247,0.05) 45%, transparent 75%)",
+          filter: "blur(6px)", // Оптимальний м'який блюр без ефекту велетенської плями
+          transition: "width 0.5s ease, height 0.35s ease, background 0.5s ease",
           willChange: "transform",
         }}
       />
+
+      {/* Маленький внутрішній ореол */}
       <div
         ref={haloSmallRef}
         className="pointer-events-none fixed hidden md:block z-[9999] rounded-full top-0 left-0"
         style={{
-          width: "30px",
-          height: "30px",
-          background: "radial-gradient(circle, rgba(165,180,252,0.18) 0%, transparent 70%)",
+          width: "24px",
+          height: "24px",
+          background: "radial-gradient(circle, rgba(165,180,252,0.2) 0%, transparent 70%)",
+          filter: "blur(2px)", // Легке пом'якшення для внутрішнього ядра
           transition: "width 0.3s ease, height 0.3s ease, background 0.3s ease",
           willChange: "transform",
         }}
       />
+
+      {/* Центральна зірочка */}
       <div
         ref={starRef}
         className="pointer-events-none fixed hidden md:block z-[9999] top-0 left-0 select-none"
         style={{
-          fontSize: "13px",
+          fontSize: "12px",
           color: "rgb(199,210,254)",
-          textShadow: "0 0 8px rgba(199,210,254,0.7)",
+          textShadow: "0 0 6px rgba(199,210,254,0.6)",
           transition: "font-size 0.2s ease, color 0.2s ease, text-shadow 0.2s ease",
           willChange: "transform",
           lineHeight: 1,

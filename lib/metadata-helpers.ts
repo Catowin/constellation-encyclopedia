@@ -25,8 +25,8 @@ export function getConstellationMeta(id: string, lang: SupportedLang) {
 
   const title =
     lang === "uk"
-      ? `${name} — розташування на нічному небі | Енциклопедія сузір'їв`
-      : `${name} constellation in the night sky | Constellation Encyclopedia`;
+      ? `${name} — розташування на нічному небі`
+      : `${name} constellation in the night sky`;
 
   const description =
     lang === "uk"

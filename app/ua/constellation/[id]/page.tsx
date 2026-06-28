@@ -8,53 +8,63 @@ export async function generateMetadata({
   params: Promise<{ id: string }>;
 }): Promise<Metadata> {
   const { id } = await params;
-  const meta = getConstellationMeta(id, "en");
+  const meta = getConstellationMeta(id, "uk");
 
   if (!meta) {
-    return { title: "Constellation not found | Constellation Encyclopedia" };
+    return {
+      title: "Сузір'я не знайдено | Енциклопедія сузір'їв",
+    };
   }
 
   return {
     title: meta.title,
     description: meta.description,
+
     alternates: {
       canonical: meta.canonicalPath,
       languages: {
-        en: `${BASE_URL}/constellation/${id}`,
-        uk: `${BASE_URL}/ua/constellation/${id}`,
+        "en": `${BASE_URL}/constellation/${id}`,
+        "uk": `${BASE_URL}/ua/constellation/${id}`,
         "x-default": `${BASE_URL}/constellation/${id}`,
       },
     },
+
     openGraph: {
       title: meta.title,
       description: meta.description,
       url: meta.canonicalPath,
-      siteName: "Constellation Encyclopedia",
-      locale: "en_US",
-      alternateLocale: ["uk_UA"],
+      siteName: "Енциклопедія сузір'їв",
+      locale: "uk_UA",
+      alternateLocale: ["en_US"],
       type: "article",
       images: [
         {
-          url: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Ursa_Major_constellation_map.svg/1200px-Ursa_Major_constellation_map.svg.png",
+          url: `https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Ursa_Major_constellation_map.svg/1200px-Ursa_Major_constellation_map.svg.png`,
           width: 1200,
           height: 630,
-          alt: `${meta.name} constellation map`,
+          alt: `Карта сузір'я ${meta.name}`,
         },
       ],
     },
+
     twitter: {
       card: "summary_large_image",
       title: meta.title,
       description: meta.description,
     },
-    robots: { index: true, follow: true },
+
+    robots: {
+      index: true,
+      follow: true,
+    },
   };
 }
 
-export default function ConstellationPage({
+export default function UaConstellationPage({
   params,
 }: {
   params: Promise<{ id: string }>;
 }) {
-  return <ConstellationPageInner params={params} defaultLang="en" />;
+  // Рендерить той самий компонент але з defaultLang="uk"
+  return <ConstellationPageInner params={params} defaultLang="uk" />;
 }

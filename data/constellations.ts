@@ -1962,6 +1962,8 @@ export const constellations: ConstellationData[] = [
   lines: generatedStars["volans"]?.lines,
 },
 
+
+
 {
   id: "vulpecula",
   name: { uk: "Лисичка", en: "Vulpecula" },
@@ -1982,4 +1984,49 @@ export const constellations: ConstellationData[] = [
   image: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6a/Vulpecula_constellation_map.svg/640px-Vulpecula_constellation_map.svg.png",
   stars: (generatedStars["vulpecula"]?.stars ?? []),
   lines: generatedStars["vulpecula"]?.lines,
-}]
+}, 
+{
+  id: "caelum",
+  name: { uk: "Різець", en: "Caelum" },
+  skyX: -190,
+  skyY: 30,
+  description: {
+    uk: "Різець — одне з найменших і найтьмяніших сузір'їв неба, введене Лакайлем у 1756 році на честь різця скульптора або гравера. Жодна зірка не яскравіша за 4.4 зоряної величини. Сузір'я розташоване між Ериданом і Голубом і практично непомітне навіть у темну ніч. З України видно взимку дуже низько над горизонтом і лише з відкритим видом на південь.",
+    en: "Caelum is one of the smallest and faintest constellations in the sky, introduced by Lacaille in 1756 to honour the engraver's chisel or burin. No star is brighter than magnitude 4.4. The constellation lies between Eridanus and Columba and is virtually invisible even on a dark night. From Ukraine it is only visible in winter very low on the southern horizon.",
+  },
+  legend: {
+    uk: "Різець не має mythology — це суто інструментальна назва Лакайля. Він назвав сузір'я на честь різця — інструмента граверів і скульпторів для вирізання по металу або каменю. Первісна латинська назва була Caelum Sculptoris (Різець Скульптора), пізніше скорочена до Caelum.",
+    en: "Caelum has no mythology — it is a purely instrumental name from Lacaille, honouring the engraver's chisel used for cutting metal or stone. The original Latin name was Caelum Sculptoris (the Sculptor's Chisel), later shortened to Caelum.",
+  },
+  howToFind: {
+    uk: "Різець розташований між Ериданом і Голубом, на південь від зірки Курса (Бета Еридана). З України практично недоступний. З широт південніше 40° пн. ш. видно взимку як групу тьмяних зір без характерної форми. Найкраще видно у грудні та січні з широт південніше 30° пн. ш.",
+    en: "Caelum lies between Eridanus and Columba, south of the star Cursa (Beta Eridani). It is practically inaccessible from Ukraine. From latitudes south of 40° North it is visible in winter as a group of faint stars with no distinctive shape. Best seen December through January from latitudes south of 30° North.",
+  },
+  image: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Caelum_constellation_map.svg/640px-Caelum_constellation_map.svg.png",
+  stars: (generatedStars["caelum"]?.stars ?? []),
+  lines: generatedStars["caelum"]?.lines,
+}, 
+{
+  id: "grus",
+  name: { uk: "Журавель", en: "Grus" },
+  skyX: -182,
+  skyY: 32,
+  description: {
+    uk: "Журавель — помірно яскраве сузір'я південного неба, введене нідерландськими мореплавцями наприкінці XVI ст. Його найяскравіша зірка — Альнаір (Альфа Журавля, магнітуда 1.74) — одна з найяскравіших зірок південного осіннього неба. Сузір'я розташоване між Південною Рибою та Туканом. З України видно лише восени дуже низько над горизонтом.",
+    en: "Grus is a moderately bright southern constellation introduced by Dutch navigators in the late 16th century. Its brightest star, Alnair (Alpha Gruis, magnitude 1.74), is one of the brightest stars of the southern autumn sky. The constellation lies between Piscis Austrinus and Tucana. From Ukraine it is only visible in autumn very low on the southern horizon.",
+  },
+  legend: {
+    uk: "Журавель не має давньої mythology — це суто навігаційна назва нідерландських мореплавців XVI ст. Журавель як птах символізував далекі мандри та повернення додому у багатьох культурах світу. Нідерландські картографи просто назвали сузір'я на честь птаха, якого бачили під час своїх плавань.",
+    en: "Grus has no ancient mythology — it is a purely navigational name from Dutch navigators of the 16th century. The crane as a bird symbolized long journeys and homecoming in many world cultures. Dutch cartographers simply named the constellation after the bird they observed during their voyages.",
+  },
+  howToFind: {
+    uk: "Знайдіть яскравий Фомальгаут (Південна Риба) і дивіться від нього на схід і вниз: Альнаір — яскрава зірка в цій ділянці осіннього неба. З України Журавель видно лише у вересні та жовтні дуже низько над південним горизонтом. Найкраще спостерігати з широт південніше 30° пн. ш.",
+    en: "Find the bright star Fomalhaut (Piscis Austrinus) and look east and below it: Alnair is the bright star in that part of the autumn sky. From Ukraine Grus is only visible in September and October very low on the southern horizon. Best observed from latitudes south of 30° North.",
+  },
+  image: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Grus_constellation_map.svg/640px-Grus_constellation_map.svg.png",
+  stars: (generatedStars["grus"]?.stars ?? []),
+  lines: generatedStars["grus"]?.lines,
+}
+
+]
+

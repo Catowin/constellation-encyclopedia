@@ -135,7 +135,15 @@ export default function ConstellationPage({
   const [hoveredStar, setHoveredStar] = useState<string | null>(null);
   const [navSearch, setNavSearch] = useState("");
   const [touchStart, setTouchStart] = useState<number | null>(null);
-  const [lang, setLang] = useState<Lang>("uk");
+const [lang, setLang] = useState<Lang>(() => {
+  if (typeof window === "undefined") return "uk";
+  return (localStorage.getItem("lang") as Lang) ?? "uk";
+});
+
+const handleSetLang = (l: Lang) => {
+  setLang(l);
+  localStorage.setItem("lang", l);
+};
 
   const goNext = useCallback(() => {
     dirRef.current = "right";
@@ -484,24 +492,24 @@ export default function ConstellationPage({
               </div>
 
               {/* Перемикач мови */}
-              <div style={{ borderTop: "1px solid rgba(201,168,76,0.12)", display: "flex", justifyContent: "center", gap: 4, padding: "12px 0" }}>
-                {(["uk", "la", "en"] as Lang[]).map((l) => (
-                  <button key={l} onClick={() => setLang(l)}
-                    className="focus:outline-none"
-                    style={{
-                      fontFamily: "'Cormorant SC', Georgia, serif",
-                      fontSize: 11, letterSpacing: "0.18em",
-                      padding: "4px 12px",
-                      background: "none", border: "none",
-                      color: lang === l ? "rgba(255,220,100,1)" : "rgba(201,168,76,0.32)",
-                      textShadow: lang === l ? "0 0 14px rgba(201,168,76,0.7)" : "none",
-                      borderBottom: lang === l ? "1px solid rgba(201,168,76,0.7)" : "1px solid transparent",
-                      transition: "all 0.15s ease",
-                    }}>
-                    {l === "uk" ? "УКР" : l === "la" ? "LAT" : "ENG"}
-                  </button>
-                ))}
-              </div>
+          <div style={{ borderTop: "1px solid rgba(201,168,76,0.12)", display: "flex", justifyContent: "center", gap: 4, padding: "12px 0" }}>
+  {(["uk", "en"] as Lang[]).map((l) => (
+    <button key={l} onClick={() => handleSetLang(l)}
+      className="focus:outline-none"
+      style={{
+        fontFamily: "'Cormorant SC', Georgia, serif",
+        fontSize: 11, letterSpacing: "0.18em",
+        padding: "4px 12px",
+        background: "none", border: "none",
+        color: lang === l ? "rgba(255,220,100,1)" : "rgba(201,168,76,0.32)",
+        textShadow: lang === l ? "0 0 14px rgba(201,168,76,0.7)" : "none",
+        borderBottom: lang === l ? "1px solid rgba(201,168,76,0.7)" : "1px solid transparent",
+        transition: "all 0.15s ease",
+      }}>
+      {l === "uk" ? "УКР" : "ENG"}
+    </button>
+  ))}
+</div>
             </motion.div>
           </>
         )}
@@ -769,3 +777,4 @@ export default function ConstellationPage({
     </main>
   );
 }
+

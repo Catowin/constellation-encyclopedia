@@ -233,7 +233,7 @@ const handleSetLang = (l: Lang) => {
   };
 
   return (
-    <main className="relative w-screen h-screen overflow-hidden bg-slate-950">
+    <main className="relative w-screen h-screen overflow-hidden" style={{ background: "#0a0e1a" }}>
 
       {/* ШАР 1 — Фонові зірки */}
       <div className="absolute inset-0 z-0">
@@ -249,17 +249,30 @@ const handleSetLang = (l: Lang) => {
       </div>
 
       {/* ШАР 2 — Туманність */}
-      <motion.div
-        className="absolute inset-0 z-0 pointer-events-none"
-
-        animate={{ x: `${current.skyX * 0.4}vw`, y: `${current.skyY * 0.4}vh` }}
-        transition={{ type: "tween", duration: 0.5, ease: "easeOut" }}
-      >
-        <div className="absolute rounded-full opacity-20 blur-[120px]" style={{
-          width: "60vw", height: "60vw", top: "20%", left: "20%",
-          background: "radial-gradient(circle, rgba(99,102,241,0.6) 0%, rgba(139,92,246,0.3) 40%, transparent 70%)",
-        }} />
-      </motion.div>
+<div className="absolute inset-0 z-0 pointer-events-none">
+  {/* Мобільний — менший blur, більша opacity */}
+  <div className="block md:hidden absolute rounded-full" style={{
+    width: "120vw",
+    height: "120vw",
+    top: "50%",
+    left: "50%",
+    transform: "translate(-50%, -50%)",
+    opacity: 0.6,
+    filter: "blur(160px)",
+    background: "radial-gradient(circle, rgba(80,90,220,0.9) 0%, rgba(120,80,200,0.55) 45%, transparent 70%)",
+  }} />
+  {/* Десктоп — більший blur, менша opacity */}
+  <div className="hidden md:block absolute rounded-full" style={{
+    width: "70vw",
+    height: "70vw",
+    top: "50%",
+    left: "50%",
+    transform: "translate(-50%, -50%)",
+    opacity: 0.25,
+    filter: "blur(140px)",
+    background: "radial-gradient(circle, rgba(80,90,220,0.7) 0%, rgba(120,80,200,0.35) 45%, transparent 70%)",
+  }} />
+</div>
 
       {/* ШАР 3 — Зірки сузір'я */}
       <div className="absolute inset-0 z-10">
@@ -275,7 +288,7 @@ const handleSetLang = (l: Lang) => {
             initial="enter"
             animate="show"
             exit="exit"
-            transition={{ duration: 0.35, ease: "easeOut" }}
+            transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1] }}
             className="absolute inset-0"
           >
             {current.viewBox ? (
@@ -363,10 +376,10 @@ const handleSetLang = (l: Lang) => {
         <AnimatePresence mode="wait">
           <motion.button
             key={current.id}
-            initial={{ opacity: 0, y: 12 }}
+            initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -8 }}
-            transition={{ duration: 0.3 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.5, ease: "easeOut" }}
             onClick={() => setIsModalOpen(true)}
             className="group flex flex-col items-center gap-1 cursor-none focus:outline-none"
           >
@@ -376,7 +389,7 @@ const handleSetLang = (l: Lang) => {
             </span>
             <h1
               className="constellation-name"
-              style={{ fontSize: "clamp(18px, 2.5vw, 26px)" }}
+              style={{ fontSize: "clamp(22px, 5vw, 26px)" }}
             >
               {t(current.name, lang)}
             </h1>
@@ -400,12 +413,12 @@ const handleSetLang = (l: Lang) => {
 
       {/* ШАР 5 — Стрілки */}
       <div className="absolute inset-y-0 left-4 z-20 flex items-center">
-        <button onClick={goPrev} className="p-2 text-slate-600 hover:text-slate-300 transition-colors cursor-none focus:outline-none group">
+        <button onClick={goPrev} className="p-4 text-slate-600 hover:text-slate-300 transition-colors cursor-none focus:outline-none group">
           <ChevronLeft size={20} className="group-hover:scale-110 transition-transform" />
         </button>
       </div>
       <div className="absolute inset-y-0 right-14 z-20 flex items-center">
-        <button onClick={goNext} className="p-2 text-slate-600 hover:text-slate-300 transition-colors cursor-none focus:outline-none group">
+        <button onClick={goNext} className="p-4 text-slate-600 hover:text-slate-300 transition-colors cursor-none focus:outline-none group">
           <ChevronRight size={20} className="group-hover:scale-110 transition-transform" />
         </button>
       </div>
@@ -432,8 +445,8 @@ const handleSetLang = (l: Lang) => {
               transition={{ type: "tween", duration: 0.18, ease: "easeOut" }}
               className="fixed top-0 right-0 h-full z-50 flex flex-col"
               style={{
-                width: 288,
-                background: "linear-gradient(180deg, rgba(8,6,12,0.99) 0%, rgba(12,9,18,0.99) 100%)",
+                width: 288,background: "linear-gradient(180deg, rgba(6,8,14,0.99) 0%, rgba(8,11,18,0.99) 100%)",
+                
                 borderLeft: "1px solid rgba(201,168,76,0.18)",
               }}
             >
@@ -534,7 +547,7 @@ const handleSetLang = (l: Lang) => {
               transition={{ duration: 0.2, ease: "easeOut" }}
               className="relative w-full max-w-4xl flex flex-col"
               style={{
-                maxHeight: "88vh",
+               height: "88vh",
                 background: "linear-gradient(145deg, rgba(12,9,18,0.98) 0%, rgba(16,12,24,0.97) 50%, rgba(10,7,16,0.98) 100%)",
                 border: "1px solid rgba(201,168,76,0.3)",
                 boxShadow: "0 0 0 1px rgba(201,168,76,0.06), inset 0 1px 0 rgba(201,168,76,0.1), 0 40px 100px rgba(0,0,0,0.8), 0 0 60px rgba(201,168,76,0.04)",
@@ -573,7 +586,7 @@ const handleSetLang = (l: Lang) => {
                   fontSize: "clamp(20px, 2.8vw, 28px)",
                   fontWeight: 400,
                   letterSpacing: "0.18em",
-                  color: "rgba(245,234,212,0.92)",
+                  color: "rgba(255,245,220,1)",
                 }}>
                   {t(current.name, lang)}
                 </h2>
@@ -601,7 +614,7 @@ const handleSetLang = (l: Lang) => {
               <div className="flex flex-col md:flex-row overflow-hidden flex-1 min-h-0">
 
                 {/* Зображення */}
-                <div className="w-full md:w-5/12 flex-shrink-0 flex items-center justify-center p-6 min-h-[160px] md:min-h-0"
+                <div className="hidden md:flex w-full md:w-5/12 flex-shrink-0 items-center justify-center p-6 md:min-h-0"
                   style={{ borderRight: "1px solid rgba(201,168,76,0.1)", background: "rgba(0,0,0,0.2)" }}>
                   <AnimatePresence mode="wait">
                     <motion.div
@@ -627,15 +640,15 @@ const handleSetLang = (l: Lang) => {
 
                 {/* Текст — скролиться */}
                 <div className="flex-1 flex flex-col min-h-0">
-                  <div className="flex-1 overflow-y-auto px-7 md:px-9 pt-6 pb-4"
+                  <div className="flex-1 overflow-y-auto px-5 md:px-9 pt-5 pb-4"
                     style={{ scrollbarWidth: "thin", scrollbarColor: "rgba(201,168,76,0.2) transparent" }}>
                     <AnimatePresence mode="wait">
                       <motion.div
                         key={activeTab}
-                        initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }}
-                        transition={{ duration: 0.15 }}
+                        initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }}
+                        transition={{ duration: 0.35, ease: "easeOut"}}
                       >
-                        <p style={{ fontSize: 9, letterSpacing: "0.35em", color: "rgba(201,168,76,0.45)", fontFamily: "'Cormorant SC', Georgia, serif", marginBottom: 16 }}>
+                        <p style={{ fontSize: 9, letterSpacing: "0.35em", color: "rgba(201,168,76,0.75)", fontFamily: "'Cormorant SC', Georgia, serif", marginBottom: 16 }}>
                           {tabLabels[activeTab]}
                         </p>
                         <h3 style={{
@@ -643,17 +656,17 @@ const handleSetLang = (l: Lang) => {
                           fontSize: "clamp(18px, 2vw, 22px)",
                           fontWeight: 400,
                           letterSpacing: "0.12em",
-                          color: "rgba(245,234,212,0.9)",
+                          color: "rgba(255,245,220,1)",
                           marginBottom: 16,
                         }}>
                           {t(current.name, "uk")}
                         </h3>
                         <p style={{
                           fontFamily: "'Cormorant Garamond', Georgia, serif",
-                          fontSize: 17,
+                          fontSize: "clamp(16px, 4.2vw, 17px)",
                           lineHeight: 1.9,
                           fontWeight: 300,
-                          color: "rgba(245,234,212,0.78)",
+                          color: "rgba(245,234,212,0.95)",
                         }}>
                           {tabContent[activeTab]}
                         </p>
@@ -728,7 +741,7 @@ const handleSetLang = (l: Lang) => {
           font-size: 13px;
           letter-spacing: 0.12em;
           font-family: 'Cormorant SC', Georgia, serif;
-          color: rgba(201,168,76,0.38);
+         color: rgba(201,168,76,0.65);
           background: transparent;
           border: none;
           border-right: 2px solid transparent;
@@ -754,7 +767,7 @@ const handleSetLang = (l: Lang) => {
           font-family: 'Cormorant SC', Georgia, serif;
           font-size: 13px;
           letter-spacing: 0.18em;
-          color: rgba(201,168,76,0.32);
+          color: rgba(201,168,76,0.6);
           background: transparent;
           border: none;
           border-bottom: 1px solid transparent;

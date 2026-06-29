@@ -331,7 +331,7 @@ export default function ConstellationPageInner({
 
       {/* ШАР 2 — Туманність */}
       <div className="absolute inset-0 z-0 pointer-events-none">
-        <div className="block md:hidden absolute rounded-full" style={{ width: "260vw", height: "260vw", top: "50%", left: "50%", transform: "translate(-50%, -50%)", opacity: 0.6, filter: "blur(260px)", background: "radial-gradient(circle, rgba(80,90,220,0.9) 0%, rgba(120,80,200,0.5) 45%, transparent 70%)" }} />
+        <div className="block md:hidden absolute rounded-full" style={{ width: "160vw", height: "160vw", top: "50%", left: "50%", transform: "translate(-50%, -50%)", opacity: 0.6, filter: "blur(260px)", background: "radial-gradient(circle, rgba(80,90,220,0.9) 0%, rgba(120,80,200,0.5) 45%, transparent 70%)" }} />
         <div className="hidden md:block absolute rounded-full" style={{ width: "70vw", height: "70vw", top: "50%", left: "50%", transform: "translate(-50%, -50%)", opacity: 0.25, filter: "blur(140px)", background: "radial-gradient(circle, rgba(80,90,220,0.7) 0%, rgba(120,80,200,0.35) 45%, transparent 70%)" }} />
       </div>
 
@@ -352,13 +352,13 @@ export default function ConstellationPageInner({
                 return <line key={idx} x1={parseFloat(sa.left)} y1={parseFloat(sa.top)} x2={parseFloat(sb.left)} y2={parseFloat(sb.top)} stroke="rgba(165,180,252,0.22)" strokeWidth="0.4" strokeDasharray="1.5 2.5" />;
               })}
               {current.stars.map((star, idx) => {
-                const cx = parseFloat(star.left), cy = parseFloat(star.top), r = star.size * 0.14;
+                const cx = parseFloat(star.left), cy = parseFloat(star.top), r = star.size * 0.17;
                 return (
                   <g key={idx}>
-                    <circle cx={cx} cy={cy} r={r * 1.8} fill="url(#halo2)" opacity={0.7} style={{ pointerEvents: "none" }} />
+                    <circle cx={cx} cy={cy} r={r * 1.9} fill="url(#halo2)" opacity={0.7} style={{ pointerEvents: "none" }} />
                     <polygon points={starPoints(cx, cy, r * 1.2)} fill="rgba(255,248,220,1)" opacity={0.95} filter="url(#glow2)" className="star-twinkle"
                       style={{ ["--dur" as string]: `${2 + (idx % 4) * 0.7}s`, ["--delay" as string]: `${(idx * 0.4) % 3}s`, pointerEvents: "none" }} />
-                    <circle cx={cx} cy={cy} r={2.5} fill="transparent" onMouseEnter={() => handleStarEnter(star.name)} onMouseLeave={handleStarLeave} style={{ cursor: "none" }} />
+                    <circle cx={cx} cy={cy} r={1.5} fill="transparent" onMouseEnter={() => handleStarEnter(star.name)} onMouseLeave={handleStarLeave} style={{ cursor: "none" }} />
                     {hoveredStar === star.name && (
                       <text x={cx} y={cy - r - 1.5} textAnchor="middle" fontSize={1.8} letterSpacing={0.3} fill="rgba(253,230,138,1)"
                         fontFamily="'Cormorant SC', Georgia, serif"

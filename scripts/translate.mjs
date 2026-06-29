@@ -19,7 +19,8 @@ async function translate(text) {
     }),
   })
   const data = await response.json()
-  return data.translations[0].text
+  console.log('DeepL response:', JSON.stringify(data))
+  return data.translations?.[0]?.text ?? ''
 }
 
 function parseFrontmatter(content) {
@@ -33,8 +34,7 @@ const files = fs.readdirSync(UK_DIR).filter(f => f.endsWith('.md'))
 for (const file of files) {
   const enPath = path.join(EN_DIR, file)
 
-  // пропускаємо якщо EN версія вже є
-  if (fs.existsSync(enPath)) {
+  if (fs.existsSync(enPath) && fs.readFileSync(enPath, 'utf8').trim() !== '') {
     console.log(`⏭️  Пропускаємо ${file} — вже перекладено`)
     continue
   }

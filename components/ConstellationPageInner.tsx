@@ -352,7 +352,8 @@ export default function ConstellationPageInner({
                 return <line key={idx} x1={parseFloat(sa.left)} y1={parseFloat(sa.top)} x2={parseFloat(sb.left)} y2={parseFloat(sb.top)} stroke="rgba(165,180,252,0.22)" strokeWidth="0.4" strokeDasharray="1.5 2.5" />;
               })}
               {current.stars.map((star, idx) => {
-                const cx = parseFloat(star.left), cy = parseFloat(star.top), r = star.size * 0.17;
+                const cx = parseFloat(star.left), cy = parseFloat(star.top), starR = star.size * 0.17;
+                const isMobile = typeof window !== "undefined" && window.innerWidth < 768; const r = star.size * (isMobile ? 0.25 : 0.17);
                 return (
                   <g key={idx}>
                     <circle cx={cx} cy={cy} r={r * 1.9} fill="url(#halo2)" opacity={0.7} style={{ pointerEvents: "none" }} />
@@ -398,17 +399,17 @@ export default function ConstellationPageInner({
         </div>
       </div>
 
-      {/* ШАР 5 — Стрілки */}
-      <div className="absolute inset-y-0 left-4 z-20 flex items-center">
-        <button onClick={goPrev} className="p-4 text-slate-500 hover:text-slate-300 transition-colors cursor-none focus:outline-none group">
-          <ChevronLeft size={20} className="group-hover:scale-110 transition-transform" />
-        </button>
-      </div>
-      <div className="absolute inset-y-0 right-14 z-20 flex items-center">
-        <button onClick={goNext} className="p-4 text-slate-500 hover:text-slate-300 transition-colors cursor-none focus:outline-none group">
-          <ChevronRight size={20} className="group-hover:scale-110 transition-transform" />
-        </button>
-      </div>
+  {/* ШАР 5 — Стрілки */}
+{/* <div className="absolute inset-y-0 left-4 z-20 flex items-center">
+  <button onClick={goPrev} className="p-4 text-slate-500 hover:text-slate-300 transition-colors cursor-none focus:outline-none group">
+    <ChevronLeft size={20} className="group-hover:scale-110 transition-transform" />
+  </button>
+</div>
+<div className="absolute inset-y-0 right-14 z-20 flex items-center">
+  <button onClick={goNext} className="p-4 text-slate-500 hover:text-slate-300 transition-colors cursor-none focus:outline-none group">
+    <ChevronRight size={20} className="group-hover:scale-110 transition-transform" />
+  </button>
+</div> */}
 
       {/* ШАР 6 — Кнопка меню */}
       <button onClick={() => setIsNavOpen(true)}
